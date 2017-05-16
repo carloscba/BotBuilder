@@ -375,10 +375,13 @@ export class PromptRecognizers {
          
         options = options || {};
         let entities: IEntity<number>[] = [];
-        let text = utterance.trim().toLowerCase();
+        
+        let text = removeAccent(utterance.trim().toLowerCase());
+
         let tokens = matchAll(simpleTokenizer, text);
         let maxDistance = options.hasOwnProperty('maxTokenDistance') ? options.maxTokenDistance : 2;
         values.forEach((value, index) => {
+            value = removeAccent(value);
             if (typeof value === 'string') {
                 // To match "last one" in "the last time I chose the last one" we need 
                 // to recursively search the utterance starting from each token position.
@@ -439,4 +442,16 @@ function matchAll(exp: RegExp, text: string): string[] {
         matches.push(match[0]);
     }
     return matches;
+}
+
+function removeAccent (value){    
+    var r=value.toLowerCase();
+    r = r.replace(new RegExp(/[àáâãäå]/g),"a");
+    r = r.replace(new RegExp(/[èéêë]/g),"e");
+    r = r.replace(new RegExp(/[ìíîï]/g),"i");
+    r = r.replace(new RegExp(/ñ/g),"n");                
+    r = r.replace(new RegExp(/[òóôõö]/g),"o");
+    r = r.replace(new RegExp(/[ùúûü]/g),"u");
+
+    return r;
 }
